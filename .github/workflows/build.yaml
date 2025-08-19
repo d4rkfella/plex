@@ -9,11 +9,14 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
       VENDOR: d4rkfella
       VERSION: 1.42.1.10060-4e8b05daf
 
@@ -41,6 +44,7 @@ jobs:
       
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
+        id: push
         with:
           context: .
           file: ./Dockerfile
@@ -50,5 +54,23 @@ jobs:
             VENDOR=${{ env.VENDOR }}
             VERSION=${{ env.VERSION }}
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ env.VERSION_SHORT }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION_SHORT }}
+
+      - name: Cosign Sign Image
+        uses: sigstore/cosign-installer@v2
+        with:
+          version: latest
+
+      - name: Sign Image with Cosign
+        run: |
+          cosign sign \
+            --identity-token ${{ github.token }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
+      
+      - name: Attest
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
