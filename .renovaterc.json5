@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>home-operations/renovate-config"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Process Annotations in Dockerfiles",
+      "managerFilePatterns": ["Dockerfile"],
+      "matchStrings": [
+        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ],
+  "customDatasources": {
+    "plex": {
+      "defaultRegistryUrlTemplate": "https://plex.tv/api/downloads/5.json",
+      "format": "json",
+      "transformTemplates": ["{\"releases\":[{\"version\": computer.Linux.version}]}"]
+    }
+  },
+  "packageRules": [
+    {
+      "description": ["Release Rules for Application Updates"],
+      "additionalBranchPrefix": "plex-",
+      "commitMessageExtra": "( {{currentVersion}} → {{newVersion}} )",
+      "commitMessageTopic": "{{depName}}",
+      "matchFileNames": ["Dockerfile"],
+      "semanticCommitScope": "plex",
+      "semanticCommitType": "release"
+    },
+    {
+      "description": ["Auto-merge Application Updates"],
+      "matchFileNames": ["Dockerfile"],
+      "automerge": true,
+      "automergeType": "pr",
+      "ignoreTests": false
+    }
+  ]
+}
