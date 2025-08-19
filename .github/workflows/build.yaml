@@ -18,9 +18,7 @@ jobs:
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
-      VENDOR: d4rkfella
-      VERSION: 1.42.1.10060-4e8b05daf
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -38,9 +36,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract sanitized version
+      - name: Extract version for Docker tag
         run: |
-          VERSION_SHORT="${VERSION%%-*}"
+          VERSION_RAW=$(grep '^ARG VERSION=' Dockerfile | cut -d'=' -f2)
+          VERSION_SHORT="${VERSION_RAW%%-*}"
           echo "VERSION_SHORT=$VERSION_SHORT" >> $GITHUB_ENV
       
       - name: Build and Push Docker Image
@@ -52,9 +51,12 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           provenance: false
+          labels: |
+            org.opencontainers.image.url=https://ghcr.io/${{ github.repository_owner }}/plex
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.vendor=${{ github.repository_owner }}
           build-args: |
-            VENDOR=${{ env.VENDOR }}
-            VERSION=${{ env.VERSION }}
+            VENDOR=${{ github.repository_owner }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION_SHORT }}
@@ -75,4 +77,3 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-and-push.outputs.digest }}
           push-to-registry: true
-
