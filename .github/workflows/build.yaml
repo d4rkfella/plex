@@ -10,6 +10,7 @@ permissions:
   contents: read
   packages: write
   id-token: write
+  attestations: write
 
 jobs:
   docker:
@@ -19,7 +20,7 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
       VENDOR: d4rkfella
       VERSION: 1.42.1.10060-4e8b05daf
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,10 +64,9 @@ jobs:
           version: latest
 
       - name: Sign Image with Cosign
-        run: |
-          cosign sign \
-            --identity-token ${{ github.token }} \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
+        env:
+            COSIGN_EXPERIMENTAL: "true"
+        run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
       
       - name: Attest
         uses: actions/attest-build-provenance@v2
