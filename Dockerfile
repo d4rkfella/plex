@@ -1,7 +1,9 @@
 FROM debian:trixie-slim
+
 ARG TARGETARCH
 ARG VENDOR
-ARG VERSION
+# renovate: datasource=custom.plex depName=plex versioning=loose
+ARG VERSION=1.42.1.10060-4e8b05daf
 
 ENV DEBIAN_FRONTEND="noninteractive" \
     NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
@@ -46,3 +48,6 @@ WORKDIR /config
 VOLUME ["/config"]
 
 ENTRYPOINT ["/usr/bin/catatonit", "--", "/entrypoint.sh"]
+
+LABEL org.opencontainers.image.title="plex"
+LABEL org.opencontainers.image.version="${VERSION}"
