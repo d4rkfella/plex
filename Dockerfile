@@ -41,9 +41,12 @@ RUN \
     && apt-get clean \
     && rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/
 
+RUN groupadd -g 65532 nonroot \
+    && useradd -u 65532 -g 65532 -M -s /usr/sbin/nologin nonroot
+
 COPY . /
 
-USER nobody:nogroup
+USER nonroot:nonroot
 WORKDIR /config
 VOLUME ["/config"]
 
