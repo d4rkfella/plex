@@ -41,8 +41,8 @@ jobs:
       - name: Extract version for Docker tag
         run: |
           VERSION_RAW=$(grep '^ARG VERSION=' Dockerfile | cut -d'=' -f2)
-          VERSION_SHORT="${VERSION_RAW%%-*}"
-          echo "VERSION_SHORT=$VERSION_SHORT" >> $GITHUB_ENV
+          VERSION_SANITIZED="${VERSION_RAW%%-*}"
+          echo "VERSION_SANITIZED=$VERSION_SANITIZED" >> $GITHUB_ENV
       
       - name: Build and Push Docker Image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
@@ -61,21 +61,34 @@ jobs:
             VENDOR=${{ github.repository_owner }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION_SHORT }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION_SANITIZED }}
 
       - name: Cosign Sign Image
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
-        with:
-          cosign-release: 'v2.5.3'
 
       - name: Sign Image with Cosign
         env:
             COSIGN_EXPERIMENTAL: "true"
         run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
       
-      - name: Generate artifact attestation
+      - name: Attest build provenance
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-and-push.outputs.digest }}
+          push-to-registry: true
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@8e94d75ddd33f69f691467e42275782e4bfefe84 # v0.20.9
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+          format: 'spdx-json'
+          output-file: 'sbom.spdx.json'
+      
+      - name: Attest sbom
+        uses: actions/attest-sbom@4651f806c01d8637787e274ac3bdf724ef169f34 # v3.0.0
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build-and-push.outputs.digest }}
+          sbom-path: 'sbom.spdx.json'
           push-to-registry: true
