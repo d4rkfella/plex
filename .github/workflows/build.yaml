@@ -31,6 +31,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
+      - name: Set up Cosign
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
@@ -54,17 +57,14 @@ jobs:
           platforms: linux/amd64,linux/arm64
           provenance: false
           labels: |
-            org.opencontainers.image.url=https://ghcr.io/${{ github.repository_owner }}/plex
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
+            org.opencontainers.image.url=https://ghcr.io/${{ github.repository_owner }}/containers/pkgs/container/plex
           build-args: |
             VENDOR=${{ github.repository_owner }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:rolling
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION_SANITIZED }}
-
-      - name: Cosign Sign Image
-        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
 
       - name: Sign Image with Cosign
         env:
