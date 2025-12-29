@@ -22,7 +22,6 @@ RUN \
     && \
     apt-get install -y --no-install-recommends --no-install-suggests \
         bash \
-        libnvidia-encode1 \
         ca-certificates \
         catatonit \
         coreutils \
