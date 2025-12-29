@@ -11,7 +11,8 @@ ENV DEBIAN_FRONTEND="noninteractive" \
     PLEX_MEDIA_SERVER_HOME="/usr/lib/plexmediaserver" \
     PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS="6" \
     PLEX_MEDIA_SERVER_INFO_VENDOR="Docker" \
-    PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container (${VENDOR})"
+    PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container (${VENDOR})" \
+    LD_LIBRARY_PATH="/usr/local/glibc/usr/lib:$LD_LIBRARY_PATH"
 
 USER root
 WORKDIR /app
@@ -21,6 +22,7 @@ RUN \
     && \
     apt-get install -y --no-install-recommends --no-install-suggests \
         bash \
+        libnvidia-encode1 \
         ca-certificates \
         catatonit \
         coreutils \
