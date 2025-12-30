@@ -1,4 +1,4 @@
-FROM debian:trixie-slim@sha256:e711a7b30ec1261130d0a121050b4ed81d7fb28aeabcf4ea0c7876d4e9f5aca2
+FROM debian:trixie-slim@sha256:91e29de1e4e20f771e97d452c8fa6370716ca4044febbec4838366d459963801
 
 ARG TARGETARCH
 ARG VENDOR
@@ -12,10 +12,9 @@ ENV DEBIAN_FRONTEND="noninteractive" \
     PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS="6" \
     PLEX_MEDIA_SERVER_INFO_VENDOR="Docker" \
     PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container (${VENDOR})" \
-    LD_LIBRARY_PATH="/usr/local/glibc/usr/lib:$LD_LIBRARY_PATH"
+    LD_LIBRARY_PATH="/usr/local/glibc/usr/lib"
 
 USER root
-WORKDIR /app
 
 RUN \
     apt-get update \
@@ -42,10 +41,10 @@ RUN \
     && apt-get clean \
     && rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/
 
-RUN groupadd -g 65532 nonroot \
-    && useradd -u 65532 -g 65532 -M -s /usr/sbin/nologin nonroot
+RUN groupadd -r -g 65532 nonroot \
+    && useradd  -r -u 65532 -g nonroot -M -s /usr/sbin/nologin nonroot
 
-COPY . /
+COPY entrypoint.sh /
 
 USER nonroot:nonroot
 WORKDIR /config
