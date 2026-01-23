@@ -3,7 +3,7 @@ FROM debian:trixie-slim@sha256:77ba0164de17b88dd0bf6cdc8f65569e6e5fa6cd256562998
 ARG TARGETARCH
 ARG VENDOR
 # renovate: datasource=custom.plex depName=plex versioning=loose
-ARG VERSION=1.43.0.10389-8be686aa6
+ARG VERSION=1.43.0.10467-2b1ba6e69
 
 ENV DEBIAN_FRONTEND="noninteractive" \
     NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
