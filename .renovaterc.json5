@@ -22,13 +22,18 @@
   },
   "packageRules": [
     {
+      "description": ["Enable beta/pre-release versions"],
+      "matchFileNames": ["Dockerfile"],
+      "ignoreUnstable": false
+    },
+    {
       "description": ["Release Rules for Application Updates"],
       "additionalBranchPrefix": "plex-",
       "commitMessageExtra": "( {{currentVersion}} → {{newVersion}} )",
       "commitMessageTopic": "{{depName}}",
       "matchFileNames": ["Dockerfile"],
       "semanticCommitScope": "plex",
-      "semanticCommitType": "release"
+      "semanticCommitType": "release",
     },
     {
       "description": ["Auto-merge Application Updates"],
