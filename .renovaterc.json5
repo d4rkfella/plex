@@ -39,7 +39,7 @@
       "description": ["Auto-merge Application Updates"],
       "matchFileNames": ["Dockerfile"],
       "pinDigests": true,
-      "commitMessageExtra": "( {{currentDigest}} → {{newDigest}} )",
+      "commitMessageExtra": "( {{currentDigestShort}} → {{newDigestShort}} )",
       "semanticCommitScope": "container",
       "semanticCommitType": "chore",
       "automerge": true,
