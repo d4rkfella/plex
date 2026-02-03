@@ -33,7 +33,7 @@
       "commitMessageTopic": "{{depName}}",
       "matchFileNames": ["Dockerfile"],
       "semanticCommitScope": "plex",
-      "semanticCommitType": "release"
+      "semanticCommitType": "release",
     },
     {
       "description": ["Auto-merge Application Updates"],
@@ -41,10 +41,10 @@
       "pinDigests": true,
       "commitMessageExtra": "( {{currentValue}} → {{newValue}} )",
       "semanticCommitScope": "container",
-      "semanticCommitType": "chore"
+      "semanticCommitType": "chore",
       "automerge": true,
       "automergeType": "pr",
-      "ignoreTests": false
+      "ignoreTests": false,
     }
   ]
 }
