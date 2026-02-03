@@ -33,7 +33,7 @@
       "commitMessageTopic": "{{depName}}",
       "matchFileNames": ["Dockerfile"],
       "semanticCommitScope": "plex",
-      "semanticCommitType": "release",
+      "semanticCommitType": "release"
     },
     {
       "description": ["Auto-merge Application Updates"],
