@@ -45,10 +45,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract version for Docker tag
+        id: version
         run: |
           VERSION_RAW=$(grep '^ARG VERSION=' Dockerfile | cut -d'=' -f2)
           VERSION_SANITIZED="${VERSION_RAW%%-*}"
-          echo "VERSION_SANITIZED=$VERSION_SANITIZED" >> $GITHUB_ENV
+          echo "version=${VERSION_SANITIZED}" >> $GITHUB_OUTPUT
       
       - name: Build and Push Docker Image
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
@@ -66,8 +67,8 @@ jobs:
           build-args: |
             VENDOR=${{ github.repository_owner }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:rolling
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION_SANITIZED }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
 
       - name: Sign Image with Cosign
         env:
