@@ -31,7 +31,6 @@
       "matchDatasources": ["regex"],
       "semanticCommitScope": "plex",
       "semanticCommitType": "release",
-      "ignoreUnstable": false,
     },
     {
       "description": ["Docker Base Image Updates"],
